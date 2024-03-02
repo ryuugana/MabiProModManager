@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MabiModManager", "MabiModManager.csproj", "{E6533B10-4ED2-4378-953D-98FAB8DECDDA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6533B10-4ED2-4378-953D-98FAB8DECDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E6533B10-4ED2-4378-953D-98FAB8DECDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E6533B10-4ED2-4378-953D-98FAB8DECDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E6533B10-4ED2-4378-953D-98FAB8DECDDA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {49425920-8389-438D-9DB1-1E54E5FB8175}
+	EndGlobalSection
+EndGlobal

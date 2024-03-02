@@ -44,7 +44,7 @@ namespace MabiModManager
         // Holds the arguments for launching client.exe
         readonly string[] launchArgs = new string[3] { " code:1622 ver:200 logip:", " logport:11000 chatip:", " chatport:8002 setting:\"file://data/features.xml=Regular, Japan\"" };
 
-        string logIp = "162.253.176.221";
+        string[] logIp = { "funf.mabi.pro", "funf.mabi.pro", "drei.mabi.pro" };
 
         // Argument to look for when checking remote client version
         const string patchInfoArg = "main_version";
@@ -65,7 +65,8 @@ namespace MabiModManager
             downloadWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(downloadWorker_DoWork);
             downloadWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(downloadWorker_RunWorkerCompleted);
 
-            Update managerUpdate = new Update();
+            // Uncomment if updating the patcher is needed
+            // Update managerUpdate = new Update();
 
             InitializeComponent();
         }
@@ -172,7 +173,7 @@ namespace MabiModManager
         {
             try
             {
-                System.Diagnostics.Process.Start("Client.exe", launchArgs[0] + logIp + launchArgs[1] + logIp + launchArgs[2]);
+                System.Diagnostics.Process.Start("Client.exe", launchArgs[0] + logIp[LoginServer.SelectedIndex] + launchArgs[1] + logIp[LoginServer.SelectedIndex] + launchArgs[2]);
             }
             catch (Exception)
             {
@@ -210,6 +211,7 @@ namespace MabiModManager
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patchInfoURL);
             try
             {
+                request.Timeout = 500;
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream))
@@ -217,7 +219,7 @@ namespace MabiModManager
                     html = reader.ReadLine();
                     string[] split = html.Split(' ');
                     mainVer = int.Parse(split[0]);
-                    logIp = split[1];
+                    logIp[0] = split[1];
                 }
 
                 // Download Files

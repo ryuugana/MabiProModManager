@@ -44,6 +44,7 @@ namespace MabiModManager
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patchInfoURL);
             try
             {
+                request.Timeout = 250;
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream))
