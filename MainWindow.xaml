@@ -18,8 +18,8 @@
             <ProgressBar x:Name="DownloadProgressBar" Height="20" Margin="10,0,320,10" VerticalAlignment="Bottom" Background="#FF9E9E9E" BorderBrush="{x:Null}" Grid.ColumnSpan="2"/>
             <Label x:Name="StartButton" Content="Start Game" HorizontalContentAlignment="Center" Margin="0,0,10,10" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Height="54" Background="#FF9E9E9E" Grid.Column="1" MouseLeftButtonDown="StartButton_MouseLeftButtonDown" HorizontalAlignment="Right" Width="115" IsEnabled="False"/>
             <Label x:Name="UpdateLabel" Content="Checking for updates" HorizontalAlignment="Left" Margin="10,391,0,30" Grid.ColumnSpan="2" Foreground="White" FontSize="14"/>
-            <CheckBox x:Name="AstralCheckBox" Content="AstralWorld" HorizontalAlignment="Left" Margin="462,426,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" FontSize="14"/>
-            <CheckBox x:Name="KananCheckBox" Content="Kanan" HorizontalAlignment="Left" Margin="462,397,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" RenderTransformOrigin="0.455,0.861" Height="18" FontSize="14"/>
+            <CheckBox x:Name="AstralCheckBox" Content="AstralWorld" HorizontalAlignment="Left" Margin="462,426,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" FontSize="14" Click="AstralCheckBox_Click"/>
+            <CheckBox x:Name="KananCheckBox" Content="Kanan" HorizontalAlignment="Left" Margin="462,397,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" RenderTransformOrigin="0.455,0.861" Height="18" FontSize="14" Click="KananCheckBox_Click"/>
             <ComboBox x:Name="LoginServer" Margin="559,423,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="88" SelectedIndex="0" Grid.Column="1">
                 <ComboBoxItem Content="Default"/>
                 <ComboBoxItem Content="Funf"/>

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
@@ -49,6 +50,16 @@ namespace MabiModManager
 
         // Argument to look for when checking remote client version
         const string patchInfoArg = "main_version";
+
+        // Name of the file downloaded
+        const string downloadFileName = "tmp.zip";
+
+        // Login server choice file
+        const string loginServerFile = "login_choice.dat";
+
+        // Names of mod files
+        const string kananFile = "dsound.dll";
+        const string astralFile = "Mss32.dlx";
 
         // Default server version
         int mainVer = 350;
@@ -155,6 +166,7 @@ namespace MabiModManager
         {
             try
             {
+                File.WriteAllText(loginServerFile, LoginServer.SelectedIndex.ToString());
                 System.Diagnostics.Process.Start("Client.exe", launchArgs[0] + logIp[LoginServer.SelectedIndex] + launchArgs[1] + logIp[LoginServer.SelectedIndex] + launchArgs[2]);
             }
             catch (Exception)
@@ -178,23 +190,28 @@ namespace MabiModManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
+            KananCheckBox.IsChecked = File.Exists(kananFile);
+            AstralCheckBox.IsChecked = File.Exists(astralFile);
+
+            try
+            {
+                LoginServer.SelectedIndex = Convert.ToInt32(File.ReadAllText(loginServerFile));
+            }
+            catch (Exception ex) 
+            {
+                LoginServer.SelectedIndex = 0;
+            }
+
             checkForUpdateWorker.RunWorkerAsync();
         }
 
         private void update()
         {
-            if (clientVer < mainVer)
+            if (clientVer < mainVer && canUpdate)
             {
-                UpdateLabel.Content = "Updating MabiPro " + Convert.ToString(clientVer) + " to " + Convert.ToString(clientVer + 1);
-
-                try
+                if(download("Updating MabiPro " + Convert.ToString(clientVer) + " to " + Convert.ToString(clientVer + 1), 
+                    patchURL + System.Convert.ToString(clientVer) + "_to_" + System.Convert.ToString(clientVer + 1) + ".zip"))
                 {
-                    using (var newPatch = new WebClient())
-                    {
-                        newPatch.DownloadFileCompleted += wc_DownloadCompleted;
-                        newPatch.DownloadProgressChanged += wc_DownloadProgressChanged;
-                        newPatch.DownloadFileAsync(new Uri(patchURL + System.Convert.ToString(clientVer) + "_to_" + System.Convert.ToString(clientVer + 1) + ".zip"), "tmp.zip");
-                    }
                     clientVer++;
                     if (rawClientVer[0] + 1 < 256)
                         rawClientVer[0] += 1;
@@ -205,16 +222,36 @@ namespace MabiModManager
                     }
                     File.WriteAllBytes(@".\" + clientVerFile, rawClientVer);
                 }
-                catch (WebException)
-                {
-                    UpdateLabel.Content = "Download Error";
-                }
             }
             else
             {
-                UpdateLabel.Content = "Up to date!";
-                StartButton.IsEnabled = true;
+                UpdateLabel.Content = "Ready to launch!";
+                toggleButtons(true);
             }
+        }
+
+        private bool download(string label, string downloadUri)
+        {
+            toggleButtons(false);
+            UpdateLabel.Content = label;
+
+            try
+            {
+                using (var newPatch = new WebClient())
+                {
+                    newPatch.DownloadFileCompleted += wc_DownloadCompleted;
+                    newPatch.DownloadProgressChanged += wc_DownloadProgressChanged;
+                    newPatch.DownloadFileAsync(new Uri(downloadUri), downloadFileName);
+                }
+
+                return true;
+            }
+            catch (WebException)
+            {
+                UpdateLabel.Content = "Download Error";
+            }
+
+            return false;
         }
 
 
@@ -268,6 +305,7 @@ namespace MabiModManager
             }
         }
 
+        // Continue update if we received version from website
         private void checkForUpdateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             if(canUpdate)
@@ -277,7 +315,7 @@ namespace MabiModManager
             else
             {
                 UpdateLabel.Content = "Unable to Update";
-                StartButton.IsEnabled = true;
+                toggleButtons(true);
             }
         }
 
@@ -286,11 +324,11 @@ namespace MabiModManager
         private void downloadWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             // Extract new patch
-            using (ZipArchive archive = ZipFile.Open(@".\tmp.zip", ZipArchiveMode.Update))
+            using (ZipArchive archive = ZipFile.Open(@".\" + downloadFileName, ZipArchiveMode.Update))
             {
                 archive.ExtractToDirectory(@".\", true);
             }
-            File.Delete(@".\tmp.zip");
+            File.Delete(@".\" + downloadFileName);
         }
 
         private void downloadWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
@@ -298,6 +336,73 @@ namespace MabiModManager
             update();
         }
 
+        private void toggleButtons(bool enabled)
+        {
+            StartButton.IsEnabled = enabled;
+            KananCheckBox.IsEnabled = enabled;
+            AstralCheckBox.IsEnabled = enabled;
+        }
+
+        // Mod install/uninstall handlers
+        private void KananCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            KananCheckBox.IsEnabled = false;
+            if((bool)KananCheckBox.IsChecked)
+            {
+                if (!download("Downloading Kanan", "https://github.com/ryuugana/kanan-mabipro/releases/latest/download/KananMabiPro.zip"))
+                {
+                    UpdateLabel.Content = "Failed to install Kanan";
+                    KananCheckBox.IsChecked = false;
+                    toggleButtons(true);
+                }
+            }
+            else
+            {
+                try
+                {
+                    File.Delete(kananFile);
+                    UpdateLabel.Content = "Removed Kanan";
+                }
+                catch (Exception ex)
+                {
+                    UpdateLabel.Content = "Failed to remove Kanan";
+                    KananCheckBox.IsChecked = true;
+                }
+
+                KananCheckBox.IsEnabled = true;
+            }
+        }
+
+        private void AstralCheckBox_Click(object sender, RoutedEventArgs e)
+        {
+            AstralCheckBox.IsEnabled = false;
+            if ((bool)AstralCheckBox.IsChecked)
+            {
+                if (!download("Downloading AstralWorld", "https://raw.githubusercontent.com/ryuugana/kanan-mabipro/refs/heads/master/AstralWorld%20v2.17.zip"))
+                {
+                    UpdateLabel.Content = "Failed to install AstralWorld";
+                    AstralCheckBox.IsChecked = false;
+                    toggleButtons(true);
+                }
+            }
+            else
+            {
+                try
+                {
+                    const string mss32 = "Mss32.dll";
+                    File.Delete(mss32);
+                    File.Move(astralFile, mss32);
+                    UpdateLabel.Content = "Removed AstralWorld";
+                }
+                catch (Exception ex)
+                {
+                    UpdateLabel.Content = "Failed to remove AstralWorld";
+                    AstralCheckBox.IsChecked = true;
+                }
+
+                AstralCheckBox.IsEnabled = true;
+            }
+        }
     }
 
     // Inherit ExtractToDirectory from ZipArchiveExtensions 
