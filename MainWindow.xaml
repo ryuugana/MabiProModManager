@@ -9,29 +9,23 @@
     <Grid Background="#FF2D2D30">
         <Rectangle Fill="#FF2D2D30" HorizontalAlignment="Left" Height="40" VerticalAlignment="Top" Width="800" MouseDown="Rectangle_MouseDown"/>
         <Label Content="X" HorizontalAlignment="Right" HorizontalContentAlignment="Center" VerticalAlignment="Top" VerticalContentAlignment="Center" RenderTransformOrigin="4.341,-7.194" Background="#FF2D2D30" Width="50" Height="40" Foreground="White" FontFamily="Arial" MouseLeftButtonDown="Label_MouseLeftButtonDown" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave" FontSize="16"/>
-        <Grid x:Name="PatcherGrid" Background="#FF2D2D30" Margin="0,66,0,0">
+        <Grid x:Name="PatcherGrid" Background="#FF2D2D30" Margin="0,45,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="23*"/>
                 <ColumnDefinition Width="777*"/>
             </Grid.ColumnDefinitions>
-            <WebBrowser x:Name="browser" HorizontalAlignment="Left" Height="363" Margin="10,10,0,0" VerticalAlignment="Top" Width="780" Source="https://mabi.pro/patch/launcher3.php" Navigating="Browser_OnLoadCompleted" Grid.ColumnSpan="2"/>
-            <ProgressBar x:Name="DownloadProgressBar" Height="20" Margin="10,0,130,10" VerticalAlignment="Bottom" Background="#FF9E9E9E" BorderBrush="{x:Null}" Grid.ColumnSpan="2"/>
-            <Label x:Name="StartButton" Content="Start Game" HorizontalContentAlignment="Center" Margin="0,0,10,10" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Height="45" Background="#FF9E9E9E" Grid.Column="1" MouseLeftButtonDown="StartButton_MouseLeftButtonDown" HorizontalAlignment="Right" Width="115"/>
-            <Label x:Name="UpdateLabel" Content="Checking for updates" HorizontalAlignment="Left" Margin="10,378,0,30" Grid.ColumnSpan="2" Foreground="White"/>
-        </Grid>
-        <Label x:Name="Patcher" Content="Patcher" HorizontalAlignment="Left" Margin="10,40,0,0" VerticalAlignment="Top" Foreground="White" MouseEnter="Label_MouseEnter" MouseLeave="Label_MouseLeave" Loaded="Label_Loaded" MouseLeftButtonDown="Label_MouseLeftButtonDown_1" IsManipulationEnabled="True"/>
-        <Label x:Name="Options" Content="Options" Margin="64,40,0,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Left" MouseLeave="Label_MouseLeave" MouseEnter="Label_MouseEnter" RenderTransformOrigin="0.764,1.85" Loaded="Label_Loaded" MouseLeftButtonDown="Label_MouseLeftButtonDown_1"/>
-        <Grid x:Name="OptionsGrid" Background="#FF2D2D30" Margin="0,66,0,0" Visibility="Hidden">
-            <CheckBox x:Name="AstralCheckBox" Content="AstralWorld" HorizontalAlignment="Left" Margin="10,44,0,0" VerticalAlignment="Top" Background="White" Foreground="White"/>
-            <CheckBox x:Name="KananCheckBox" Content="Kanan" HorizontalAlignment="Left" Margin="10,64,0,0" VerticalAlignment="Top" Background="White" Foreground="White"/>
-            <Label Content="Install/Remove Mods" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Foreground="White" FontSize="14"/>
-            <Label x:Name="InstallMods" Content="Update" HorizontalAlignment="Left" HorizontalContentAlignment="Center" Margin="669,381,0,0" VerticalAlignment="Top" VerticalContentAlignment="Center" Height="43" Width="121" Background="#FF9E9E9E" MouseLeftButtonDown="StartButton_MouseLeftButtonDown"/>
-            <ComboBox x:Name="LoginServer" Margin="10,118,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="88" SelectedIndex="0">
+            <WebBrowser x:Name="browser" HorizontalAlignment="Left" Height="376" Margin="10,10,0,0" VerticalAlignment="Top" Width="780" Source="https://mabi.pro/patch/launcher3.php" Navigating="Browser_OnLoadCompleted" Grid.ColumnSpan="2"/>
+            <ProgressBar x:Name="DownloadProgressBar" Height="20" Margin="10,0,320,10" VerticalAlignment="Bottom" Background="#FF9E9E9E" BorderBrush="{x:Null}" Grid.ColumnSpan="2"/>
+            <Label x:Name="StartButton" Content="Start Game" HorizontalContentAlignment="Center" Margin="0,0,10,10" VerticalAlignment="Bottom" VerticalContentAlignment="Center" Height="54" Background="#FF9E9E9E" Grid.Column="1" MouseLeftButtonDown="StartButton_MouseLeftButtonDown" HorizontalAlignment="Right" Width="115" IsEnabled="False"/>
+            <Label x:Name="UpdateLabel" Content="Checking for updates" HorizontalAlignment="Left" Margin="10,391,0,30" Grid.ColumnSpan="2" Foreground="White" FontSize="14"/>
+            <CheckBox x:Name="AstralCheckBox" Content="AstralWorld" HorizontalAlignment="Left" Margin="462,426,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" FontSize="14"/>
+            <CheckBox x:Name="KananCheckBox" Content="Kanan" HorizontalAlignment="Left" Margin="462,397,0,0" VerticalAlignment="Top" Background="White" Foreground="White" Grid.Column="1" RenderTransformOrigin="0.455,0.861" Height="18" FontSize="14"/>
+            <ComboBox x:Name="LoginServer" Margin="559,423,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="88" SelectedIndex="0" Grid.Column="1">
                 <ComboBoxItem Content="Default"/>
                 <ComboBoxItem Content="Funf"/>
                 <ComboBoxItem Content="Drei"/>
             </ComboBox>
-            <Label Content="Login Server" Margin="10,84,0,0" VerticalAlignment="Top" Foreground="White" FontSize="14" HorizontalAlignment="Left" Width="88"/>
+            <Label Content="Login Server" Margin="559,391,0,0" VerticalAlignment="Top" Foreground="White" HorizontalAlignment="Left" Width="88" Grid.Column="1" RenderTransformOrigin="0.5,0.116" FontSize="14"/>
         </Grid>
         <Label Content="MabiModManager" HorizontalAlignment="Left" Margin="35,4,0,0" VerticalAlignment="Top" Foreground="White" MouseDown="Rectangle_MouseDown" FontSize="16"/>
         <Image HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="20" Source="MabiModManager.png" Margin="10,10,0,0" MouseDown="Rectangle_MouseDown"/>
