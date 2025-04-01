@@ -8,6 +8,7 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -56,14 +57,21 @@ namespace MabiModManager
         // 95 + 256 = 350?
         int clientVer = 350;
         byte[] rawClientVer = new byte[4] { 95, 1, 0, 0 };
+
+        bool canUpdate = false;
         
         private readonly BackgroundWorker downloadWorker = new BackgroundWorker();
+        private readonly BackgroundWorker checkForUpdateWorker = new BackgroundWorker();
 
         public MainWindow()
         {
             downloadWorker.WorkerReportsProgress = true;
             downloadWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(downloadWorker_DoWork);
             downloadWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(downloadWorker_RunWorkerCompleted);
+
+            checkForUpdateWorker.WorkerReportsProgress = true;
+            checkForUpdateWorker.DoWork += new System.ComponentModel.DoWorkEventHandler(checkForUpdateWorker_DoWork);
+            checkForUpdateWorker.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(checkForUpdateWorker_RunWorkerCompleted);
 
             // Uncomment if updating the patcher is needed
             // Update managerUpdate = new Update();
@@ -112,32 +120,6 @@ namespace MabiModManager
             }
         }
 
-        private void Label_MouseLeftButtonDown_1(object sender, MouseButtonEventArgs e)
-        {
-            Label lbl = sender as Label;
-            switch (lbl.Content)
-            {
-                case "Patcher":
-                    lbl.Background = new SolidColorBrush(Color.FromRgb(158, 158, 158));
-                    lbl.IsManipulationEnabled = true;
-                    PatcherGrid.Visibility = Visibility.Visible;
-                    Options.Background = new SolidColorBrush(Color.FromRgb(45, 45, 48));
-                    Options.IsManipulationEnabled = false;
-                    OptionsGrid.Visibility = Visibility.Hidden;
-                    break;
-                case "Options":
-                    lbl.Background = new SolidColorBrush(Color.FromRgb(158, 158, 158));
-                    lbl.IsManipulationEnabled = true;
-                    OptionsGrid.Visibility = Visibility.Visible;
-                    Patcher.Background = new SolidColorBrush(Color.FromRgb(45, 45, 48));
-                    Patcher.IsManipulationEnabled = false;
-                    PatcherGrid.Visibility = Visibility.Hidden;
-                    break;
-                default:
-                    break;
-            }
-        }
-
         private void Label_MouseEnter(object sender, MouseEventArgs e)
         {
             Label lbl = sender as Label;
@@ -180,6 +162,7 @@ namespace MabiModManager
                 MessageBox.Show("Unable to find Client.exe\n\nMake sure this program is in the your MabiPro folder", "Launch Error",
                                 MessageBoxButton.OK, MessageBoxImage.Error);
             }
+            Thread.Sleep(5000);
             Environment.Exit(0);
         }
         
@@ -195,41 +178,7 @@ namespace MabiModManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            // Defining variables
-            string html = string.Empty;
-            // Get version
-            try
-            {
-                rawClientVer = File.ReadAllBytes(clientVerFile);
-                clientVer = rawClientVer[0] + (rawClientVer[1] * 256);
-            }
-            catch (Exception)
-            {
-            }
-
-            // Grab patch.txt and assign values
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patchInfoURL);
-            try
-            {
-                request.Timeout = 500;
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                using (Stream stream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(stream))
-                {
-                    html = reader.ReadLine();
-                    string[] split = html.Split(' ');
-                    mainVer = int.Parse(split[0]);
-                    logIp[0] = split[1];
-                }
-
-                // Download Files
-                update();
-            }
-            catch (Exception)
-            {
-                UpdateLabel.Content = "Unable to Update";
-                StartButton.IsEnabled = true;
-            }
+            checkForUpdateWorker.RunWorkerAsync();
         }
 
         private void update()
@@ -280,6 +229,58 @@ namespace MabiModManager
         {
             DownloadProgressBar.Value = e.ProgressPercentage;
         }
+
+        // Grab version
+        private void checkForUpdateWorker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            // Defining variables
+            string html = string.Empty;
+            // Get version
+            try
+            {
+                rawClientVer = File.ReadAllBytes(clientVerFile);
+                clientVer = rawClientVer[0] + (rawClientVer[1] * 256);
+            }
+            catch (Exception)
+            {
+            }
+
+            // Grab patch.txt and assign values
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patchInfoURL);
+            try
+            {
+                request.Timeout = 500;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    html = reader.ReadLine();
+                    string[] split = html.Split(' ');
+                    mainVer = int.Parse(split[0]);
+                    logIp[0] = split[1];
+                }
+
+                canUpdate = true;
+            }
+            catch (Exception)
+            {
+                canUpdate = false;
+            }
+        }
+
+        private void checkForUpdateWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if(canUpdate)
+            {
+                update();
+            }
+            else
+            {
+                UpdateLabel.Content = "Unable to Update";
+                StartButton.IsEnabled = true;
+            }
+        }
+
 
         // Majority of patching done here and RunWorkerCompleted
         private void downloadWorker_DoWork(object sender, DoWorkEventArgs e)
