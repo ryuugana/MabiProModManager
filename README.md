@@ -6,4 +6,4 @@ A patcher capable of the following:
 ## Download
 [The latest version can be downloaded here](https://github.com/ryuugana/MabiProModManager/releases/latest/download/MabiModManager.exe)
 ## Install
-* Place MabiModManager.exe in your MabiPro folder
+Place MabiModManager.exe in your MabiPro folder
