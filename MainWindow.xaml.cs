@@ -21,8 +21,6 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-using Update = MabiModManager.Update;
-
 
 namespace MabiModManager
 {
@@ -69,6 +67,7 @@ namespace MabiModManager
         int clientVer = 350;
         byte[] rawClientVer = new byte[4] { 95, 1, 0, 0 };
 
+        uint retryUpdate = 0;
         bool canUpdate = false;
         
         private readonly BackgroundWorker downloadWorker = new BackgroundWorker();
@@ -312,9 +311,19 @@ namespace MabiModManager
             {
                 update();
             }
+            // Retry to in case of unstable connection
+            else if (retryUpdate < 5)
+            {
+                Thread.Sleep(500);
+                retryUpdate++;
+                checkForUpdateWorker.RunWorkerAsync();
+            }
             else
             {
+                // Website is offline or user is not connected to internet
                 UpdateLabel.Content = "Unable to Update";
+
+                // Allow user to start game even if website is offline
                 toggleButtons(true);
             }
         }

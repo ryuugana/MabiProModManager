@@ -4,13 +4,14 @@ using System.Net;
 
 namespace MabiModManager
 {
+    // No longer used; easier to use git for updates
     class Update
     {
         // URL holding the current, up to date, patcher
-        const string updateURL = "http://mabiv.cc/patcher/update.exe";
+        const string updateURL = "http://example/update.exe";
 
         // URL holding the current patcher version
-        const string patchInfoURL = "http://mabiv.cc/patcher/version";
+        const string patchInfoURL = "http://example/version";
 
         // File holding the local patcher version
         const string patchVerFile = "modver";
