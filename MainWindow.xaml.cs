@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -37,6 +38,14 @@ namespace MabiModManager
         // The URL holding patch information
         const string patchInfoURL = "https://mabi.pro/patch/p.txt";
 
+        // Other URLS used
+        const string kananURL = "https://github.com/ryuugana/kanan-mabipro/releases/latest/download/KananMabiPro.zip";
+        const string astralURL = "https://raw.githubusercontent.com/ryuugana/kanan-mabipro/refs/heads/master/AstralWorld%20v2.17.zip";
+        const string patcherUpdateURL = "https://github.com/ryuugana/MabiProModManager/releases/latest/download/MabiModManager.exe";
+
+        // MabiModManager Version URL
+        const string patcherVersionURL = "https://raw.githubusercontent.com/ryuugana/MabiProModManager/refs/heads/main/Version.cs";
+
         // The file name that the local client version is stored in
         // By default this file is stored in the same directory
         const string clientVerFile = "version.dat";
@@ -51,6 +60,11 @@ namespace MabiModManager
 
         // Name of the file downloaded
         const string downloadFileName = "tmp.zip";
+
+        // Name of the patcher downloaded
+        const string patcherUpdateFileName = "MabiModManagerUpdate.exe";
+
+        const string patcherBatFileName = "updateMMM.bat";
 
         // Login server choice file
         const string loginServerFile = "login_choice.dat";
@@ -206,6 +220,11 @@ namespace MabiModManager
 
         private void update()
         {
+            // Check for MabiModManager update first
+            if (checkForPatcherUpdate())
+            {
+                updatePatcher();
+            }
             if (clientVer < mainVer && canUpdate)
             {
                 if(download("Updating MabiPro " + Convert.ToString(clientVer) + " to " + Convert.ToString(clientVer + 1), 
@@ -229,7 +248,7 @@ namespace MabiModManager
             }
         }
 
-        private bool download(string label, string downloadUri)
+        private bool download(string label, string downloadUri, string fileName = downloadFileName, bool downloadAsync = true)
         {
             toggleButtons(false);
             UpdateLabel.Content = label;
@@ -240,7 +259,14 @@ namespace MabiModManager
                 {
                     newPatch.DownloadFileCompleted += wc_DownloadCompleted;
                     newPatch.DownloadProgressChanged += wc_DownloadProgressChanged;
-                    newPatch.DownloadFileAsync(new Uri(downloadUri), downloadFileName);
+                    if (downloadAsync)
+                    {
+                        newPatch.DownloadFileAsync(new Uri(downloadUri), fileName);
+                    }
+                    else
+                    {
+                        newPatch.DownloadFile(new Uri(downloadUri), fileName);
+                    }
                 }
 
                 return true;
@@ -358,7 +384,7 @@ namespace MabiModManager
             KananCheckBox.IsEnabled = false;
             if((bool)KananCheckBox.IsChecked)
             {
-                if (!download("Downloading Kanan", "https://github.com/ryuugana/kanan-mabipro/releases/latest/download/KananMabiPro.zip"))
+                if (!download("Downloading Kanan", kananURL))
                 {
                     UpdateLabel.Content = "Failed to install Kanan";
                     KananCheckBox.IsChecked = false;
@@ -387,7 +413,7 @@ namespace MabiModManager
             AstralCheckBox.IsEnabled = false;
             if ((bool)AstralCheckBox.IsChecked)
             {
-                if (!download("Downloading AstralWorld", "https://raw.githubusercontent.com/ryuugana/kanan-mabipro/refs/heads/master/AstralWorld%20v2.17.zip"))
+                if (!download("Downloading AstralWorld", astralURL))
                 {
                     UpdateLabel.Content = "Failed to install AstralWorld";
                     AstralCheckBox.IsChecked = false;
@@ -411,6 +437,76 @@ namespace MabiModManager
 
                 AstralCheckBox.IsEnabled = true;
             }
+        }
+
+        private bool checkForPatcherUpdate()
+        {
+            string html = string.Empty;
+            bool newVersion = false;
+
+            // Grab patch.txt and assign values
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patcherVersionURL);
+            try
+            {
+                request.Timeout = 500;
+                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                using (Stream stream = response.GetResponseStream())
+                using (StreamReader reader = new StreamReader(stream))
+                {
+                    html = reader.ReadLine();
+                    html = reader.ReadLine();
+                    html = reader.ReadLine();
+                    html = reader.ReadLine();
+                    html = reader.ReadLine();
+                    html = reader.ReadLine();
+                    string[] split = reader.ReadLine().Split(' ');
+                    int patcherVersion = int.Parse(split[13].Replace(';',' '));
+                    if (patcherVersion > Version.value)
+                    {
+                        newVersion = true;
+                    }
+                }
+
+            }
+            catch (Exception)
+            {
+                newVersion = false;
+            }
+
+            return newVersion;
+        }
+
+        private void updatePatcher()
+        {
+            uint retry = 0;
+            while(!download("Downloading MabiModManager Update", patcherUpdateURL, patcherUpdateFileName, false))
+            {
+                if(++retry > 5)
+                {
+                    UpdateLabel.Content = "Failed to update MabiModManager";
+                    return;
+                }
+            }
+
+            String batch_file =
+                "echo \"Updating MabiModManager\"\n" +
+                "timeout /t 1 /nobreak\n" +
+                "move " + patcherUpdateFileName + " MabiModManager.exe \n" +
+                "echo \"MabiModManager update successful\"\n" +
+                "start MabiModManager.exe\n";
+
+            File.WriteAllText(patcherBatFileName, batch_file);
+
+            var process = new Process();
+            process.StartInfo = new ProcessStartInfo
+            {
+                WindowStyle = ProcessWindowStyle.Hidden,
+                FileName = patcherBatFileName
+            };
+
+            process.Start();
+
+            Environment.Exit(0);
         }
     }
 
