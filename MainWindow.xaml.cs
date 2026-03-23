@@ -52,8 +52,11 @@ namespace MabiModManager
 
         // Holds the arguments for launching client.exe
         readonly string[] launchArgs = new string[3] { " code:1622 ver:200 logip:", " logport:11000 chatip:", " chatport:8002 setting:\"file://data/features.xml=Regular, Japan\"" };
-
-        string[] logIp = { "funf.mabi.pro", "funf.mabi.pro", "drei.mabi.pro" };
+        
+        // logIp[0] value is a fallback in case of failure to grab from website
+        // Somewhat pointless to have a server option when there's only one node
+        // TODO: Support custom addresses or put this in a config (login_choice.dat)
+        string[] logIp = { "omega.mabi.pro", "omega.mabi.pro" };
 
         // Argument to look for when checking remote client version
         const string patchInfoArg = "main_version";
@@ -311,7 +314,7 @@ namespace MabiModManager
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(patchInfoURL);
             try
             {
-                request.Timeout = 500;
+                request.Timeout = 1000;
                 using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                 using (Stream stream = response.GetResponseStream())
                 using (StreamReader reader = new StreamReader(stream))
