@@ -4,6 +4,6 @@ namespace MabiModManager
 {
     internal class Version
     {
-        public const int value = 20260323;
+        public const int value = 20260515;
     }
 }

@@ -73,7 +73,8 @@ namespace MabiModManager
         const string loginServerFile = "login_choice.dat";
 
         // Names of mod files
-        const string kananFile = "dsound.dll";
+        const string kananFile = "bdcap23.dll";
+        const string kananFileOld = "dsound.dll";
         const string astralFile = "Mss32.dlx";
 
         // Default server version
@@ -206,7 +207,7 @@ namespace MabiModManager
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            KananCheckBox.IsChecked = File.Exists(kananFile);
+            KananCheckBox.IsChecked = File.Exists(kananFile) || File.Exists(kananFileOld);
             AstralCheckBox.IsChecked = File.Exists(astralFile);
 
             try
@@ -398,7 +399,17 @@ namespace MabiModManager
             {
                 try
                 {
-                    File.Delete(kananFile);
+                    if (File.Exists(kananFileOld))
+                    {
+                        File.Delete(kananFileOld);
+                    }
+                    else if (File.Exists(kananFile))
+                    {
+                        const string bdcap32 = "bdcap32.dll";
+                        File.Delete(bdcap32);
+                        File.Move(kananFile, bdcap32);
+                    }
+
                     UpdateLabel.Content = "Removed Kanan";
                 }
                 catch (Exception ex)
