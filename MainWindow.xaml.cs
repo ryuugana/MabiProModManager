@@ -52,11 +52,11 @@ namespace MabiModManager
 
         // Holds the arguments for launching client.exe
         readonly string[] launchArgs = new string[3] { " code:1622 ver:200 logip:", " logport:11000 chatip:", " chatport:8002 setting:\"file://data/features.xml=Regular, Japan\"" };
-        
+
         // logIp[0] value is a fallback in case of failure to grab from website
         // Somewhat pointless to have a server option when there's only one node
         // TODO: Support custom addresses or put this in a config (login_choice.dat)
-        string[] logIp = { "omega.mabi.pro", "omega.mabi.pro" };
+        string[] logIp = { "15.204.20.234", "15.204.20.234", "omega.mabi.pro" };
 
         // Argument to look for when checking remote client version
         const string patchInfoArg = "main_version";
